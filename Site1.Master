@@ -8,26 +8,108 @@
     <title></title>
     <asp:ContentPlaceHolder ID="head" runat="server">
     </asp:ContentPlaceHolder>
+    <!-- Import style -->
+      <link rel="stylesheet" href="//unpkg.com/element-plus@2.11.1/dist/index.css" />
+      <!-- Import Vue 3 -->
+      <%--<script src="//unpkg.com/vue@3.5.20"></script>--%>
+   
+      <!-- Import component library -->
+      <%--<script src="//unpkg.com/element-plus@2.11.1"></script>--%>
 </head>
 <body>
     <form id="form1" runat="server">
-        <div>
+        <asp:ScriptManager ID="ScriptManager1" runat="server">
+            <Scripts>
+                <asp:ScriptReference Path ="~/vue.global.js" />
+                <asp:ScriptReference Path="~/element.js" />
+            </Scripts>
+        </asp:ScriptManager>
+        <script src="https://cdn.jsdelivr.net/npm/vue3-sfc-loader/dist/vue3-sfc-loader.js"></script>
+        <div id="app">
             <div>
-                <h2>Master Page</h2>
+                <h2 @click="count++">Master Page - {{count}} - {{result}}</h2>
+                <asp:LinkButton ID="LinkButton1" runat="server" OnClick="LinkButton1_Click">
+                     <el-button type="primary">Primary</el-button>
+                </asp:LinkButton>
+               
+                <asp:Label ID="Label1" runat="server" Text="Label"></asp:Label>
+               
             </div>
             <div>
+                <el-menu mode="horizontal">
+                    <el-menu-item index="1">Processing Center</el-menu-item>
+   
                 <asp:Repeater ID="Repeater1" runat="server" DataSourceID="SiteMapDataSource1">
                     <ItemTemplate>
                         <div>
                             <asp:Literal ID="Literal1" runat="server" Text='<%# GenElementUIMenu(Container.DataItem as SiteMapNode) %>'></asp:Literal>
+                           
                         </div>
                     </ItemTemplate>
                 </asp:Repeater>
+                </el-menu>
             </div>
             <asp:ContentPlaceHolder ID="ContentPlaceHolder1" runat="server">
             </asp:ContentPlaceHolder>
             <asp:SiteMapDataSource ID="SiteMapDataSource1" runat="server" ShowStartingNode="False" />
         </div>
+        <script>
+
+            const options = {
+                moduleCache: {
+                    vue: Vue
+                },
+                async getFile(url) {
+
+                    const res = await fetch(url);
+                    if (!res.ok)
+                        throw Object.assign(new Error(res.statusText + ' ' + url), { res });
+                    return {
+                        getContentData: asBinary => asBinary ? res.arrayBuffer() : res.text(),
+                    }
+                },
+                addStyle(textContent) {
+
+                    const style = Object.assign(document.createElement('style'), { textContent });
+                    const ref = document.head.getElementsByTagName('style')[0] || null;
+                    document.head.insertBefore(style, ref);
+                },
+            }
+            
+          var App = {
+            data() {
+              return {
+                  message: "Hello Element Plus",
+                  count: 0
+              };
+              },
+              computed: {
+                  result: function () {
+                      return this.count > 0 ? 'Greater than 0' : 'Smaller than or equal to 0';
+                  }
+              },
+              components: {
+                  'my-btn': Vue.defineAsyncComponent(() => loadModule('<%=System.Web.VirtualPathUtility.ToAbsolute("~/Components/MyBtn.vue") %>', options))
+              },
+              
+            };
+
+            
+
+            const { loadModule } = window['vue3-sfc-loader'];
+
+            const app = Vue.createApp(App);
+        </script>
+
+         <asp:ContentPlaceHolder ID="ContentScript" runat="server">
+         </asp:ContentPlaceHolder>
+
+        <script>
+            
+            app.use(ElementPlus);
+            app.mount("#app");
+        </script>
+        
     </form>
 </body>
 </html>

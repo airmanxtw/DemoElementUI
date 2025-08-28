@@ -33,5 +33,10 @@ namespace DemoElementUI
                 return $"<el-submenu index='{siteNode["id"]}'><template slot='title'>{siteNode.Title}</template>{sb}</el-submenu>";
             }
         }
+
+        protected void LinkButton1_Click(object sender, EventArgs e)
+        {
+            Label1.Text = new Random().Next(1000, 9999).ToString();
+        }
     }
 }
