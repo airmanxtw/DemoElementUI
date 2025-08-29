@@ -11,7 +11,7 @@ namespace DemoElementUI
     {
         protected void Page_Load(object sender, EventArgs e)
         {
-
+            CaptchaImg1.SetCaptcha("abc123");
         }
     }
 }
